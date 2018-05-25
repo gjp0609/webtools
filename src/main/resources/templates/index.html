@@ -1,0 +1,19 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <span th:if="${user != null}" th:text="${user.name}">User1</span>
+    <ul th:if="${userList != null}" th:each="user : ${userList}">
+        <li th:text="|${user.id}: ${user.name}|">User2</li>
+    </ul>
+</div>
+<div th:include="test :: copy"></div>
+
+<!-- jq -->
+<script th:src="@{/js/jquery-3.3.1.js}"></script>
+</body>
+</html>

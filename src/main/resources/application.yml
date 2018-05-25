@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/webtools?useUnicode=true&characterEncoding=UTF-8
+    username:
+    password:
+    type: com.alibaba.druid.pool.DruidDataSource
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+    open-in-view: true
+  thymeleaf:
+    cache: false # 关闭缓存
+  mvc:
+    view:
+      prefix: templates/
+      suffix: .html
+  output:
+    ansi:
+      enabled: always
+  redis:
+    host: localhost
+    port: 9001
+    password:
+    database: 0
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      concurrency: 3
+    template:
+      default-topic: topic1
+    consumer:
+      group-id: 0
+    producer:
+      batch-size: 1000
+server:
+  port: 8083
