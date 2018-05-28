@@ -24,7 +24,7 @@ public class TestMain {
         @Override
         public Object call() throws Exception {
             for (int i = 0; i < 10; i++) {
-                HttpUtil.doGet("http://localhost:8083/kafka/sendMsg/t" + name + "i" + i);
+                HttpUtil.doGet("http://localhost:8083/user/getUser/3");
             }
             return null;
         }

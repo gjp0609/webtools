@@ -12,23 +12,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class KafkaService {
     private Logger log = LoggerFactory.getLogger(this.getClass());
-    private static Long sendCount = 0L;
-    private static Long processCount = 0L;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
-    public KafkaService(KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaService(@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     public void sendMessage(String topicName, String jsonData) {
-        log.info("生产方-> 向{}推送数据: [{}]，发送中", topicName, jsonData);
+        log.info("Kafka生产方-> 向{}推送数据: [{}]，发送中", topicName, jsonData);
         try {
             kafkaTemplate.send(topicName, jsonData);
         } catch (Exception e) {
-            log.error("生产方-> 发送数据出错！！！{}{}", topicName, jsonData);
-            log.error("生产方-> 发送数据出错=====>", e);
+            log.error("Kafka生产方-> 发送数据出错！！！{}{}", topicName, jsonData);
+            log.error("Kafka生产方-> 发送数据出错=====>", e);
         }
 
         //消息发送的监听器，用于回调返回信息
@@ -43,7 +41,7 @@ public class KafkaService {
 
             @Override
             public boolean isInterestedInSuccess() {
-                log.info("生产方-> 向{}推送数据: [{}]，数据发送完毕，已发送{}", topicName, jsonData, ++sendCount);
+                log.info("Kafka生产方-> 向{}推送数据: [{}]，数据发送完毕", topicName, jsonData);
                 return false;
             }
         });
@@ -51,12 +49,8 @@ public class KafkaService {
 
     @KafkaListener(topics = {"topic1"})
     public void processMessage(String content) {
-        log.info("消费方-> topic1：[{}]，处理中。。。", content);
-//        try {
-//            Thread.sleep(100);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-        log.info("消费方-> topic1：[{}]，处理完成，已处理{}", content, ++processCount);
+        log.info("Kafka消费方-> topic1：[{}]，处理中。。。", content);
+        // 此处调用服务
+        log.info("Kafka消费方-> topic1：[{}]，处理完成", content);
     }
 }

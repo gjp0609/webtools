@@ -1,5 +1,23 @@
 spring:
   datasource:
+    druid:
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        session-stat-enable: true
+        session-stat-max-count: 10
+        principal-session-name:
+        principal-cookie-name:
+        profile-enable:
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        reset-enable: false
+        login-username: admin
+        login-password: admin
+        allow: 127.0.0.1
+        deny:
+      aop-patterns: top.gjp0609.webtools
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/webtools?useUnicode=true&characterEncoding=UTF-8
     username:
