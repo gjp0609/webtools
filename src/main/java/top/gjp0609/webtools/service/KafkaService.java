@@ -16,7 +16,9 @@ public class KafkaService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
-    public KafkaService(@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") KafkaTemplate<String, String> kafkaTemplate) {
+    public KafkaService(
+            @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+                    KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 

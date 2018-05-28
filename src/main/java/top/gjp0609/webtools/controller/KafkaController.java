@@ -22,7 +22,7 @@ public class KafkaController {
 
     @GetMapping(value = "/sendMsg/{msg}")
     @ResponseBody
-    @LoggerManage(description = "kafka_sendMsg")
+    @LoggerManage("kafka_sendMsg")
     public void sendMsg(@PathVariable("msg") String msg) {
         kafkaService.sendMessage("topic1", msg);
     }
