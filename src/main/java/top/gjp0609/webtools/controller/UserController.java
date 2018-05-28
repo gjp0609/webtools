@@ -1,6 +1,9 @@
 package top.gjp0609.webtools.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +51,11 @@ public class UserController {
     @GetMapping(value = "/setName/{id}/{name}")
     @LoggerManage("user_setName")
     @ResponseBody
+    @ApiOperation(value = "更新用户信息", notes = "根据用户id更新用户名称")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "Long", paramType = "path"),
+            @ApiImplicitParam(name = "name", value = "用户名称", required = true, dataType = "String", paramType = "path")
+    })
     public String setName(@PathVariable("id") Long id, @PathVariable("name") String name) {
         int num = userRepository.modifyById(name, id);
         JSONObject jsonObject = new JSONObject();
