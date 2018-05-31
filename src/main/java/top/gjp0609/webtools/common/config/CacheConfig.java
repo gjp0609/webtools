@@ -21,6 +21,7 @@ public class CacheConfig {
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         RedisCacheWriter writer = RedisCacheWriter.nonLockingRedisCacheWriter(connectionFactory);
         RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig();
+        // todo 并没有什么用
         configuration.entryTtl(Duration.ofSeconds(30));
         return new RedisCacheManager(writer, configuration);
 //        return RedisCacheManager.builder(connectionFactory).build();

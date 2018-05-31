@@ -35,6 +35,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-redis')
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-webflux')
     compile('org.springframework.session:spring-session-data-redis')
     compile('org.springframework.kafka:spring-kafka')
     runtime('org.springframework.boot:spring-boot-devtools')

@@ -14,6 +14,7 @@ import java.util.Date;
 
 @Aspect
 @Service
+@SuppressWarnings("unused")
 public class LoggerAdvice {
 
     private ThreadLocal<Long> threadLocal = new ThreadLocal<>();
@@ -43,7 +44,7 @@ public class LoggerAdvice {
         if (null == parames || parames.length <= 0 || parames.length > 10240) {
             return "无参数";
         }
-        StringBuffer param = new StringBuffer("传入参数[ ");
+        StringBuilder param = new StringBuilder("传入参数[ ");
         for (Object obj : parames) {
             param.append(ToStringBuilder.reflectionToString(obj)).append(", ");
         }
