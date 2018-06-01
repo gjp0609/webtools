@@ -30,13 +30,13 @@ package top.gjp0609.webtools.utils;//package me.rainbow.utils;
 //        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
 //            Integer key = Integer.valueOf(String.valueOf(entry.getKey()));
 ////            if (arrayList.contains(key))
-//                treeMap.put(key, String.valueOf(entry.getValue()));
+////                treeMap.put(key, String.valueOf(entry.getColorValue()));
 //        }
 //        ArrayList<Integer> list = new ArrayList<>();
 //        for (Map.Entry<Integer, String> entry : treeMap.entrySet()) {
 //            System.out.println(entry.getKey());
 //            try {
-//                download(String.valueOf(entry.getKey()), entry.getValue());
+//                download(String.valueOf(entry.getKey()), entry.getColorValue());
 //            } catch (Exception e) {
 //                System.err.print(entry.getKey());
 //                System.err.println(", " + e.getMessage());

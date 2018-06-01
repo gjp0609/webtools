@@ -1,5 +1,7 @@
 package top.gjp0609.webtools.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -79,5 +81,21 @@ public class StringUtil {
         if (object instanceof Date)
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Date) object);
         return object.toString();
+    }
+
+    public static String getFirstUpperString(String string) {
+        String c = String.valueOf(string.charAt(0));
+        return StringUtils.upperCase(c) + string.substring(1);
+    }
+
+    public static String getFirstLowerString(String string) {
+        String c = String.valueOf(string.charAt(0));
+        return StringUtils.lowerCase(c) + string.substring(1);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getFirstLowerString("34fw4r"));
+        System.out.println(getFirstLowerString("ADWD"));
+        System.out.println(getFirstLowerString("adewdaw"));
     }
 }

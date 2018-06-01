@@ -7,19 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.ProducerListener;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 @Component
 public class KafkaService {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
+    private final JavaMailSender mailSender;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
     public KafkaService(
             @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-                    KafkaTemplate<String, String> kafkaTemplate) {
+                    KafkaTemplate<String, String> kafkaTemplate, JavaMailSender mailSender) {
         this.kafkaTemplate = kafkaTemplate;
+        this.mailSender = mailSender;
     }
 
     public void sendMessage(String topicName, String jsonData) {
@@ -53,6 +57,12 @@ public class KafkaService {
     public void processMessage(String content) {
         log.info("Kafka消费方-> topic1：[{}]，处理中。。。", content);
         // 此处调用服务
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("me@***.com");
+        msg.setTo("user@***.com");
+        msg.setSubject("Test Mail");
+        msg.setText("测试邮件内容:" + content);
+        mailSender.send(msg);
         log.info("Kafka消费方-> topic1：[{}]，处理完成", content);
     }
 }
