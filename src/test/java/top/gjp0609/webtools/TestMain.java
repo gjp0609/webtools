@@ -24,7 +24,8 @@ public class TestMain {
         @Override
         public Object call() throws Exception {
             for (int i = 0; i < 10; i++) {
-                HttpUtil.doGet("http://localhost:8083/user/getUser/3");
+                String s = HttpUtil.doGet("http://localhost:8083/user/getUser/3");
+                System.out.println(s);
             }
             return null;
         }
