@@ -22,30 +22,33 @@ public class LoggerAdvice {
 
     @Before("within(top.gjp0609..*) && @annotation(loggerManage)")
     public void addBeforeLogger(JoinPoint joinPoint, LoggerManage loggerManage) {
+        log.info("-------------------------------->>>>>>>>--------------------------------");
         log.info("执行 " + loggerManage.value() + " 开始");
         threadLocal.set(new Date().getTime());
         log.info(joinPoint.getSignature().toString());
-        log.info(parseParames(joinPoint.getArgs()));
+        log.info(parseParams(joinPoint.getArgs()));
     }
 
     @AfterReturning("within(top.gjp0609..*) && @annotation(loggerManage)")
     public void addAfterReturningLogger(JoinPoint joinPoint, LoggerManage loggerManage) {
         long l = new Date().getTime() - threadLocal.get();
         log.info("执行 " + loggerManage.value() + " 结束，耗时" + (l / 1000) + "秒");
+        log.info("--------------------------------<<<<<<<<--------------------------------\n");
     }
 
     @AfterThrowing(pointcut = "within(top.gjp0609..*) && @annotation(loggerManage)", throwing = "ex")
     public void addAfterThrowingLogger(JoinPoint joinPoint, LoggerManage loggerManage, Exception ex) {
         long l = new Date().getTime() - threadLocal.get();
         log.error("执行 " + loggerManage.value() + " 异常，耗时" + (l / 1000) + "秒");
+        log.info("--------------------------------<<<<<<<<--------------------------------\n");
     }
 
-    private String parseParames(Object[] parames) {
-        if (null == parames || parames.length <= 0 || parames.length > 10240) {
+    private String parseParams(Object[] params) {
+        if (null == params || params.length <= 0 || params.length > 10240) {
             return "无参数";
         }
         StringBuilder param = new StringBuilder("传入参数[ ");
-        for (Object obj : parames) {
+        for (Object obj : params) {
             param.append(ToStringBuilder.reflectionToString(obj)).append(", ");
         }
         param.append(" ]");

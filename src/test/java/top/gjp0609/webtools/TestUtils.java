@@ -1,6 +1,5 @@
 package top.gjp0609.webtools;
 
-import org.apache.kafka.common.protocol.types.Field;
 import top.gjp0609.webtools.utils.DebugUtil;
 
 import javax.persistence.Entity;
@@ -29,7 +28,7 @@ public class TestUtils {
     }
 
 
-    @Entity
+//    @Entity
     public static class TestClass {
 
         private String name;

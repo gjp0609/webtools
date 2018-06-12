@@ -6,6 +6,7 @@
 </head>
 <body>
 <div>
+    <div class="error" th:if="${errMsg!=null}" th:text="${errMsg}"></div>
     <span th:if="${user != null}" th:text="${user.name}">User1</span>
     <ul th:if="${userList != null}" th:each="user : ${userList}">
         <li th:text="|${user.id}: ${user.name}|">User2</li>
