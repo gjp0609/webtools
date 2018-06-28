@@ -44,7 +44,7 @@ public class WebtoolsApplicationTests {
     public void add() {
         ArrayList<User> list = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            list.add(new User(StringUtil.getRandomString(5, StringUtil.RaindomType.LOWER), StringUtil.getRandomString(6, StringUtil.RaindomType.NUMBER)));
+//            list.add(new User(StringUtil.getRandomString(5, StringUtil.RaindomType.LOWER), StringUtil.getRandomString(6, StringUtil.RaindomType.NUMBER)));
         }
         userRepository.saveAll(list);
     }

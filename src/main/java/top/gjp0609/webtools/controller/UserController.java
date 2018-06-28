@@ -1,5 +1,6 @@
 package top.gjp0609.webtools.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -18,27 +18,34 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import top.gjp0609.webtools.common.aop.LoggerManage;
 import top.gjp0609.webtools.common.validation.Groups;
+import top.gjp0609.webtools.controller.dto.DeptDTO;
+import top.gjp0609.webtools.entity.Dept;
 import top.gjp0609.webtools.entity.User;
+import top.gjp0609.webtools.repository.DeptRepo;
 import top.gjp0609.webtools.repository.UserRepository;
 import top.gjp0609.webtools.utils.DebugUtil;
 
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/user")
+//@Api("/user")
 public class UserController {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
     private UserRepository userRepository;
+    private DeptRepo deptRepo;
 
     private int size = 10;
 
+
     @Autowired
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, DeptRepo deptRepo) {
         this.userRepository = userRepository;
+        this.deptRepo = deptRepo;
     }
 
 
@@ -96,8 +103,42 @@ public class UserController {
                         .append(err.getDefaultMessage());
             }
         }
+        userRepository.save(user);
         log.info(DebugUtil.getFmtRefStr(user));
         return new ModelAndView("index").addObject("errMsg", builder);
+    }
+
+    @GetMapping(value = "/getAllUserByDeptId/{deptId}")
+    @ResponseBody
+    @ApiOperation(value = "根据部门id获取用户列表", notes = "根据部门id获取用户列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "deptId", value = "部门id", required = true, dataType = "Long", paramType = "path")
+    })
+    public String getAllUserByDeptId(@PathVariable("deptId") Long deptId) {
+        List<User> all = userRepository.findAllByDeptId(deptId);
+        return JSON.toJSONString(all);
+    }
+
+    @GetMapping(value = "/getDeptById/{deptId}")
+    @ResponseBody
+    @ApiOperation(value = "根据部门id获取部门信息", notes = "根据部门id获取部门信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "deptId", value = "部门id", required = true, dataType = "Long", paramType = "path")
+    })
+    public Map<String, Object> getDeptById(@PathVariable("deptId")  Long deptId) {
+        Map<String, Object> map = new HashMap<>();
+        Optional<Dept> optional = deptRepo.findById(deptId);
+        if (optional.isPresent()) {
+            Dept dept = optional.get();
+            List<User> users = userRepository.findAllByDeptId(dept.getId());
+            DeptDTO dto = new DeptDTO();
+            dto.setId(dept.getId());
+            dto.setName(dept.getName());
+            dto.setUserList(users);
+            map.put("dept", dto);
+            map.put("success", 1L);
+        }
+        return map;
     }
 
 }

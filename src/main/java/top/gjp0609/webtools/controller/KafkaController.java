@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import top.gjp0609.webtools.common.aop.LoggerManage;
 import top.gjp0609.webtools.service.KafkaService;
 
-@Controller
-@RequestMapping("/kafka")
+//@Controller
+//@RequestMapping("/kafka")
 public class KafkaController {
 
     private final KafkaService kafkaService;

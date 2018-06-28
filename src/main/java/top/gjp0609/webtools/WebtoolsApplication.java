@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@EnableCaching
+//@EnableCaching
 @EnableSwagger2
 @SpringBootApplication
 public class WebtoolsApplication {

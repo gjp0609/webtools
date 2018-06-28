@@ -30,8 +30,10 @@ configurations {
 
 dependencies {
     // Spring
+    // https://mvnrepository.com/artifact/net.sf.json-lib/json-lib
     compile('org.springframework.boot:spring-boot-starter-cache')
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
+//    compile('org.springframework.cloud:spring-cloud-starter-netflix-eureka-server')
     compile('org.springframework.boot:spring-boot-starter-data-redis')
     compile('org.springframework.boot:spring-boot-starter-mail')
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')

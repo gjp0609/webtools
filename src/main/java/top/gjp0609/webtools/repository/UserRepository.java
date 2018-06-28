@@ -1,6 +1,5 @@
 package top.gjp0609.webtools.repository;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -33,4 +32,5 @@ public interface UserRepository extends
 
     List<User> findAllByNameLike(@NotBlank(groups = {Groups.Add.class}) @Size(min = 1, max = 30, groups = {Groups.Add.class, Groups.Edit.class}) String name, Pageable pageable);
 
+    List<User> findAllByDeptId(Long deptId);
 }

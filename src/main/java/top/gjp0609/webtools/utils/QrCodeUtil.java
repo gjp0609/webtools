@@ -24,8 +24,8 @@ public class QrCodeUtil {
     private static final Logger LOG = Logger.getLogger(QrCodeUtil.class.getSimpleName());
 
     private static String encodeType = "UTF-8";
-    private static int width = 0;
-    private static int height = 0;
+    private static int width = 1;
+    private static int height = 1;
     private static int minSize = -1;
 
     /**
@@ -40,7 +40,8 @@ public class QrCodeUtil {
             BufferedImage image = encode(content);
             if (image != null) ImageIO.write(image, "png", targetFile);
         } catch (Exception e) {
-            LOG.warning("");
+            e.printStackTrace();
+            LOG.warning("qwe");
             return false;
         }
         return true;
