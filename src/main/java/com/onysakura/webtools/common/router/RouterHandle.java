@@ -6,11 +6,8 @@ import io.vertx.ext.web.RoutingContext;
 
 public class RouterHandle {
     private HttpMethod httpMethod;
-    private String path;
-    private Handler<RoutingContext> handler;
-
-    public RouterHandle() {
-    }
+    private final String path;
+    private final Handler<RoutingContext> handler;
 
     public RouterHandle(String path, Handler<RoutingContext> handler) {
         this.path = path;

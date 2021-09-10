@@ -21,7 +21,7 @@ public class LoggerUtil {
             "java.util.logging.ConsoleHandler.level=FINEST\n" +
             "java.util.logging.ConsoleHandler.formatter=com.onysakura.webtools.utils.CustomFormatter\n" +
             ".level=INFO\n" +
-            "com.onysakura.level=FINEST\n";
+            "com.onysakura.level=INFO\n";
 
     static {
         handler = new ConsoleHandler();
@@ -38,6 +38,7 @@ public class LoggerUtil {
         java.util.logging.Logger log = java.util.logging.Logger.getLogger(clazz.getName());
         log.setUseParentHandlers(false);
         log.addHandler(handler);
+        log.setLevel(Level.FINEST);
         return new Log(log);
     }
 

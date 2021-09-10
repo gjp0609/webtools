@@ -2,6 +2,7 @@ package com.onysakura.webtools;
 
 import com.onysakura.webtools.common.Constants;
 import com.onysakura.webtools.common.Verticles;
+import com.onysakura.webtools.common.dto.Msg;
 import com.onysakura.webtools.common.router.RouterVerticle;
 import com.onysakura.webtools.config.Configs;
 import com.onysakura.webtools.config.log.LoggerUtil;
@@ -17,6 +18,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -37,6 +41,9 @@ public class StartVerticle {
             if (ar.succeeded()) {
                 log.info("init ConfigRetriever success.");
                 JsonObject configs = ar.result().getJsonObject(Constants.VERTX_CONFIG);
+                if (configs == null) {
+                    configs = new JsonObject();
+                }
                 DeploymentOptions deploymentOptions = new DeploymentOptions().setConfig(configs);
                 String port = configs.getString(Configs.HTTP_PORT.key(), "8080");
                 Router router = Router.router(vertx);
@@ -52,7 +59,7 @@ public class StartVerticle {
                                                 RouterVerticle routerVerticle = (RouterVerticle) verticle;
                                                 Router subRouter = Router.router(vertx);
                                                 routerVerticle.getRouters().forEach(routers -> {
-                                                    log.info("route bind: {} -> {}", routers.getHttpMethod(), routers.getPath());
+                                                    log.info("route bind: {} -> {}", routers.getHttpMethod(), item.getPath() + routers.getPath());
                                                     if (routers.getHttpMethod() == null) {
                                                         subRouter.route(routers.getPath()).handler(routers.getHandler());
                                                     } else {
@@ -60,6 +67,8 @@ public class StartVerticle {
                                                     }
                                                 });
                                                 router.mountSubRouter(item.getPath(), subRouter);
+                                            }).onFailure(t -> {
+                                                log.warn("deploy verticle error", t);
                                             });
                                         } catch (Exception e) {
                                             log.error("init Verticles error.", e);
@@ -71,8 +80,14 @@ public class StartVerticle {
                         ).onFailure(t -> {
                             log.error("HTTP server started failed.", t);
                         });
+                //最后一个Route
+                router.route().last().handler(context -> {
+                    context.response().end("404");
+                }).failureHandler(context -> {
+                    context.response().end(Msg.fail().toString());
+                });
             } else {
-                log.warn("init ConfigRetriever success!");
+                log.warn("init ConfigRetriever error!");
             }
         });
     }
@@ -83,11 +98,22 @@ public class StartVerticle {
         ConfigRetrieverOptions options = new ConfigRetrieverOptions().setIncludeDefaultStores(true);
         // 禁用配置刷新
         options.setScanPeriod(-1);
+        // 命令行参数
+        JsonObject vertxConfigs = parseArgs(args);
         options.addStore(new ConfigStoreOptions()
                 .setType("json")
                 .setOptional(true)
-                .setConfig(new JsonObject().put(Constants.VERTX_CONFIG, parseArgs(args)))
+                .setConfig(new JsonObject().put(Constants.VERTX_CONFIG, vertxConfigs))
         );
+        // 配置文件
+        String configFilePath = getConfigFromFile(vertxConfigs);
+        if (configFilePath != null) {
+            log.info("find config file: {}", configFilePath);
+            options.addStore(new ConfigStoreOptions()
+                    .setType("file")
+                    .setFormat("json")
+                    .setConfig(new JsonObject().put("path", configFilePath)));
+        }
         return options;
     }
 
@@ -110,5 +136,34 @@ public class StartVerticle {
         }
         log.info("configs: {}", config.toString());
         return config;
+    }
+
+    public static String getConfigFromFile(JsonObject vertxConfigs) {
+        String configFilePath = null;
+        Config:
+        {
+            // 从参数中读取配置文件
+            if (vertxConfigs.containsKey(Configs.CONF_FILE.key())) {
+                File file = new File(vertxConfigs.getString(Configs.CONF_FILE.key()));
+                if (file.exists()) {
+                    configFilePath = file.getAbsolutePath();
+                    break Config;
+                }
+            }
+            { // 从代码结构中读取配置文件
+                Path path = Paths.get("src", "main", "resources", "config.json");
+                if (path.toFile().exists()) {
+                    configFilePath = path.toAbsolutePath().toString();
+                    break Config;
+                }
+            }
+            { // 从相对路径中读取配置文件
+                Path path = Paths.get("config.json");
+                if (path.toFile().exists()) {
+                    configFilePath = path.toAbsolutePath().toString();
+                }
+            }
+        }
+        return configFilePath;
     }
 }

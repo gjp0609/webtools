@@ -1,11 +1,15 @@
 package com.onysakura.webtools.common;
 
-import com.onysakura.webtools.api.ShortUrlServer;
+import com.onysakura.webtools.common.jdbc.H2DBVerticle;
+import com.onysakura.webtools.web.AuthServer;
+import com.onysakura.webtools.web.ShortUrlServer;
 import io.vertx.core.Verticle;
 
 public enum Verticles {
 
-    API("/api", new ShortUrlServer()),
+    AUTH("/auth", new AuthServer()),
+    ShortUrl("/api", new ShortUrlServer()),
+    SQLITE("/sqlite", new H2DBVerticle()),
     ;
 
     private final String path;

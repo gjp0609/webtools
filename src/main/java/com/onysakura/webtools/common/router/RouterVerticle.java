@@ -1,14 +1,15 @@
 package com.onysakura.webtools.common.router;
 
+import io.vertx.core.AbstractVerticle;
+
 import java.util.ArrayList;
 import java.util.List;
 
+public abstract class RouterVerticle extends AbstractVerticle {
 
-public interface RouterVerticle {
+    protected List<RouterHandle> routers = new ArrayList<>();
 
-    List<RouterHandle> routers = new ArrayList<>();
-
-    default List<RouterHandle> getRouters() {
+    public List<RouterHandle> getRouters() {
         return routers;
     }
 }
