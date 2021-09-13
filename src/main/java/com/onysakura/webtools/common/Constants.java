@@ -7,7 +7,10 @@ public interface Constants {
     String VERTX_CONFIG = "vertxConfig";
 
     interface EventBusAddress {
-        String UserAuth = "web.auth.auth";
+        // Database
+        String DB_USER_SELECT = "db.user.select";
+        String DB_PASTE_SELECT = "db.paste.select";
+        String DB_PASTE_INSERT = "db.paste.insert";
     }
 
     interface Status {

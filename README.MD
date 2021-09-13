@@ -25,3 +25,25 @@ conf_file:
   }
 }
 ```
+
+#### database
+
+SQLite
+
+sql:
+
+```sql
+-- user
+create table user
+(
+    id       integer not null
+        constraint user_pk primary key autoincrement,
+    username text,
+    password text,
+    salt     text
+);
+
+create unique index user_username_uindex on user (username);
+
+
+```

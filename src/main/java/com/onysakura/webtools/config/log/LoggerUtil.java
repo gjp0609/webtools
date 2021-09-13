@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -16,18 +18,20 @@ public class LoggerUtil {
     private static final ConsoleHandler handler;
     private static final DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
-    private static final String CONFIGS = "" +
-            "handlers=java.util.logging.ConsoleHandler\n" +
-            "java.util.logging.ConsoleHandler.level=FINEST\n" +
-            "java.util.logging.ConsoleHandler.formatter=com.onysakura.webtools.utils.CustomFormatter\n" +
-            ".level=INFO\n" +
-            "com.onysakura.level=INFO\n";
+    private static final List<String> CONFIGS = Arrays.asList(
+            "java.util.logging.ConsoleHandler.level=CONFIG",
+            "java.util.logging.ConsoleHandler.formatter=com.onysakura.webtools.utils.CustomFormatter",
+            ".level=CONFIG",
+            "com.onysakura.level=ALL",
+            "handlers=java.util.logging.ConsoleHandler"
+    );
 
     static {
         handler = new ConsoleHandler();
         handler.setFormatter(new CustomFormatter());
+        handler.setLevel(Level.ALL);
         try {
-            byte[] bytes = (CONFIGS).getBytes(StandardCharsets.UTF_8);
+            byte[] bytes = String.join("\n", CONFIGS).getBytes(StandardCharsets.UTF_8);
             LogManager.getLogManager().readConfiguration(new BufferedInputStream(new ByteArrayInputStream(bytes)));
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,7 +42,6 @@ public class LoggerUtil {
         java.util.logging.Logger log = java.util.logging.Logger.getLogger(clazz.getName());
         log.setUseParentHandlers(false);
         log.addHandler(handler);
-        log.setLevel(Level.FINEST);
         return new Log(log);
     }
 

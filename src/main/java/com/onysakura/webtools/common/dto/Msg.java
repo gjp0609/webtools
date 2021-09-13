@@ -33,6 +33,9 @@ public class Msg extends JsonObject {
     }
 
     public boolean isOk() {
-        return 1 == this.getInteger("status");
+        if (this.containsKey("status")) {
+            return 1 == this.getInteger("status");
+        }
+        return false;
     }
 }

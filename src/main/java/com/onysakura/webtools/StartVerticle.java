@@ -9,20 +9,18 @@ import com.onysakura.webtools.config.log.LoggerUtil;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Verticle;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
+import io.vertx.core.*;
 import io.vertx.core.dns.AddressResolverOptions;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 public class StartVerticle {
 
@@ -46,34 +44,52 @@ public class StartVerticle {
                 }
                 DeploymentOptions deploymentOptions = new DeploymentOptions().setConfig(configs);
                 String port = configs.getString(Configs.HTTP_PORT.key(), "8080");
-                Router router = Router.router(vertx);
+                Router rootRouter = Router.router(vertx);
                 // 创建服务
                 vertx.createHttpServer()
-                        .requestHandler(router)
+                        .requestHandler(rootRouter)
                         .listen(Integer.parseInt(port))
                         .onSuccess(server -> {
+                                    LinkedHashMap<RouterVerticle, String> routerVerticles = new LinkedHashMap<>();
+                                    ArrayList<Future> futures = new ArrayList<>();
                                     for (Verticles item : Verticles.values()) {
                                         try {
                                             Verticle verticle = item.getVerticle();
-                                            vertx.deployVerticle(verticle, deploymentOptions).onComplete(res -> {
-                                                RouterVerticle routerVerticle = (RouterVerticle) verticle;
-                                                Router subRouter = Router.router(vertx);
-                                                routerVerticle.getRouters().forEach(routers -> {
-                                                    log.info("route bind: {} -> {}", routers.getHttpMethod(), item.getPath() + routers.getPath());
-                                                    if (routers.getHttpMethod() == null) {
-                                                        subRouter.route(routers.getPath()).handler(routers.getHandler());
-                                                    } else {
-                                                        subRouter.route(routers.getHttpMethod(), routers.getPath()).handler(routers.getHandler());
-                                                    }
-                                                });
-                                                router.mountSubRouter(item.getPath(), subRouter);
-                                            }).onFailure(t -> {
-                                                log.warn("deploy verticle error", t);
-                                            });
+                                            RouterVerticle routerVerticle = (RouterVerticle) verticle;
+                                            String path = item.getPath();
+                                            routerVerticles.put(routerVerticle, path);
+                                            Future<String> future = vertx.deployVerticle(verticle, deploymentOptions);
+                                            futures.add(future);
                                         } catch (Exception e) {
                                             log.error("init Verticles error.", e);
                                         }
                                     }
+                                    CompositeFuture.all(futures).onComplete(ars -> {
+                                        if (ars.succeeded()) {
+                                            for (Map.Entry<RouterVerticle, String> entry : routerVerticles.entrySet()) {
+                                                RouterVerticle routerVerticle = entry.getKey();
+                                                String path = entry.getValue();
+                                                Router subRouter = Router.router(vertx);
+                                                routerVerticle.getRouters().forEach(router -> {
+                                                    String routerPath = router.getPath();
+                                                    HttpMethod httpMethod = router.getHttpMethod();
+                                                    log.info("route bind: {} -> {} {}",
+                                                            String.format("%20s", routerVerticle.getClass().getSimpleName()),
+                                                            String.format("%4s", httpMethod),
+                                                            path + routerPath);
+                                                    if (router.isHandleBody()) {
+                                                        subRouter.route(routerPath).handler(BodyHandler.create());
+                                                    }
+                                                    if (httpMethod == null) {
+                                                        subRouter.route(routerPath).handler(router.getHandler());
+                                                    } else {
+                                                        subRouter.route(httpMethod, routerPath).handler(router.getHandler());
+                                                    }
+                                                });
+                                                rootRouter.mountSubRouter(path, subRouter);
+                                            }
+                                        }
+                                    });
                                     long startTimeUsage = System.currentTimeMillis() - serverStartTime;
                                     log.info("HTTP server started on port {} in {} seconds.", server.actualPort(), String.format("%.3f", startTimeUsage / 1000D));
                                 }
@@ -81,7 +97,7 @@ public class StartVerticle {
                             log.error("HTTP server started failed.", t);
                         });
                 //最后一个Route
-                router.route().last().handler(context -> {
+                rootRouter.route().last().handler(context -> {
                     context.response().end("404");
                 }).failureHandler(context -> {
                     context.response().end(Msg.fail().toString());

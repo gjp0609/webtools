@@ -1,6 +1,30 @@
 ### auth/login
-GET {{url}}/auth/login?username=213
+POST {{url}}/api/auth/login
+Content-Type: application/json
 
-### api/get
-GET {{url}}/api/get
-Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJ1c2VybmFtZSI6WyIyMTMiXSwiaWF0IjoxNjMxMjYwNjczLCJleHAiOjE2MzEyNjA3MDN9.HTxr3ep4LbOqAn-akskw2tb61DUJ_9KmmR8LWDkRp_M2NHHVoe8cHi-hsVvrW0KPPAa6ubq2MQUzRio5vDIKfNd5tU6sPT-eOE9Y-Ny2bEsqwVH3BpfwNyxJXI9uQ6FJB3Wvuj1swE7eaf2kWEF-6OFmN7epQGNU7ZQxVqtJBSSlLuPf0f-04ujGuQgTaH7dVH1lvcv9EemP0tEiqTOyd5xIc0SRN7plx7GNVB-s_3XstXK2zg9x0vsoU15uHxOytE4JqhfBZCNsm4COvGsuwUPRfM9J5oQ5vMe9HsZuZLrgYZaeiiQ0mN6W64-75nftMCx--2gqM6NrBw21aHMgB6ok0hbrHqQHoh3tfJWrxTGhD4mamQm5BhiJRV84Rng-d4C9-eViXzRHI3QqUW2Rf5g0KmVsgemA7mP32OYRaZ90VlE1UHOgYTgkqZEB96A3sRJqTL9-fXEG25NpZecZ_DBstNe15cOCzpZAQRVDG0Jd3ywYMQ8okUjQ8uwWkAUH-9So6KvOKCnQ85LTp0v86z14SGR9-zFZLByNE2Cvm8joG7dC18HL81aRnEUWjY8PTwqi7R25OkuWCyZ33QhuT0np1RK_NSNPQ-n81FlcPMBF2g0ZyFPxXU-umSKNzVIcc6rrGRdvpWYd2AATkbR6Jg9UFMgSV2xGN1xRnP6c2zY
+{
+  "username": "me",
+  "password": "efe6398127928f1b2e9ef3207fb82663"
+}
+
+### paste/get
+GET {{url}}/api/auth/paste/gkRE
+Authorization: {{token}}
+
+### paste/get
+GET {{url}}/api/auth/paste/raw/gkRE
+Authorization: {{token}}
+
+### paste/get
+GET {{url}}/api/auth/paste/redirect/VmGi
+Authorization: {{token}}
+
+### paste/save
+POST {{url}}/api/auth/paste/save
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "code": "vertx",
+  "content": "https://github.com/gjp0609/webtools"
+}
