@@ -1,11 +1,11 @@
 package com.onysakura.webtools;
 
-import com.onysakura.webtools.common.Constants;
-import com.onysakura.webtools.common.Verticles;
+import com.onysakura.webtools.common.config.Configs;
+import com.onysakura.webtools.common.config.Constants;
+import com.onysakura.webtools.common.config.Verticles;
+import com.onysakura.webtools.common.config.log.LoggerUtil;
 import com.onysakura.webtools.common.dto.Msg;
 import com.onysakura.webtools.common.router.RouterVerticle;
-import com.onysakura.webtools.config.Configs;
-import com.onysakura.webtools.config.log.LoggerUtil;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -13,8 +13,10 @@ import io.vertx.core.*;
 import io.vertx.core.dns.AddressResolverOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -75,16 +77,18 @@ public class StartVerticle {
                                                     HttpMethod httpMethod = router.getHttpMethod();
                                                     log.info("route bind: {} -> {} {}",
                                                             String.format("%20s", routerVerticle.getClass().getSimpleName()),
-                                                            String.format("%4s", httpMethod),
+                                                            String.format("%4s", httpMethod == null ? "ALL" : httpMethod),
                                                             path + routerPath);
-                                                    if (router.isHandleBody()) {
-                                                        subRouter.route(routerPath).handler(BodyHandler.create());
-                                                    }
+                                                    Route ro;
                                                     if (httpMethod == null) {
-                                                        subRouter.route(routerPath).handler(router.getHandler());
+                                                        ro = subRouter.route(routerPath);
                                                     } else {
-                                                        subRouter.route(httpMethod, routerPath).handler(router.getHandler());
+                                                        ro = subRouter.route(httpMethod, routerPath);
                                                     }
+                                                    if (router.isHandleBody()) {
+                                                        ro.handler(BodyHandler.create());
+                                                    }
+                                                    ro.handler(corsHandler()).handler(router.getHandler());
                                                 });
                                                 rootRouter.mountSubRouter(path, subRouter);
                                             }
@@ -98,10 +102,11 @@ public class StartVerticle {
                         });
                 //最后一个Route
                 rootRouter.route().last().handler(context -> {
-                    context.response().end("404");
+                    context.end(Msg.fail("222").toString());
                 }).failureHandler(context -> {
-                    context.response().end(Msg.fail().toString());
-                });
+                    log.warn("warn fail");
+                    context.end(Msg.fail().toString());
+                }).handler(corsHandler());
             } else {
                 log.warn("init ConfigRetriever error!");
             }
@@ -181,5 +186,16 @@ public class StartVerticle {
             }
         }
         return configFilePath;
+    }
+
+    private static CorsHandler corsHandler() {
+        return CorsHandler.create()
+                .addOrigin("https://pages.onysakura.fun")
+                .addOrigin("https://gjp0609.gitee.io")
+//                .addOrigin("http://localhost:32000")
+                .allowedMethod(HttpMethod.GET)
+                .allowedMethod(HttpMethod.OPTIONS)
+                .allowedMethod(HttpMethod.POST)
+                .allowedMethod(HttpMethod.PUT);
     }
 }

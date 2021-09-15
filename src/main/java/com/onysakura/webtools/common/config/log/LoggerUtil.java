@@ -1,4 +1,4 @@
-package com.onysakura.webtools.config.log;
+package com.onysakura.webtools.common.config.log;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

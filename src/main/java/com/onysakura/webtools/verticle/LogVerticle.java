@@ -2,7 +2,7 @@ package com.onysakura.webtools.verticle;
 
 import com.onysakura.webtools.common.router.RouterHandle;
 import com.onysakura.webtools.common.router.RouterVerticle;
-import com.onysakura.webtools.config.log.LoggerUtil;
+import com.onysakura.webtools.common.config.log.LoggerUtil;
 import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpMethod;
 
@@ -15,7 +15,7 @@ public class LogVerticle extends RouterVerticle {
     @Override
     public void start() throws Exception {
 
-        routers.add(new RouterHandle(HttpMethod.GET, "/*", routingContext -> {
+        routers.add(new RouterHandle("/*", routingContext -> {
             log.debug("request path: {}", routingContext.pathParams());
             log.debug("request headers: {}", getParams(routingContext.request().headers()));
             log.debug("request params: {}", getParams(routingContext.queryParams()));

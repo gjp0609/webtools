@@ -16,7 +16,7 @@ GET {{url}}/api/auth/paste/raw/gkRE
 Authorization: {{token}}
 
 ### paste/get
-GET {{url}}/api/auth/paste/redirect/VmGi
+GET {{url}}/api/auth/paste/redirect/page
 Authorization: {{token}}
 
 ### paste/save
@@ -27,4 +27,16 @@ Content-Type: application/json
 {
   "code": "vertx",
   "content": "https://github.com/gjp0609/webtools"
+}
+
+### test
+POST {{url}}/api/test?query=qwe
+Content-Type: application/json
+
+{
+  "body": [
+    1,
+    2,
+    4
+  ]
 }

@@ -1,10 +1,10 @@
 package com.onysakura.webtools.verticle;
 
-import com.onysakura.webtools.common.Constants;
+import com.onysakura.webtools.common.config.EventBuses;
 import com.onysakura.webtools.common.dto.Msg;
 import com.onysakura.webtools.common.router.RouterHandle;
 import com.onysakura.webtools.common.router.RouterVerticle;
-import com.onysakura.webtools.config.log.LoggerUtil;
+import com.onysakura.webtools.common.config.log.LoggerUtil;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -20,14 +20,14 @@ public class PasteBinVerticle extends RouterVerticle {
         routers.add(new RouterHandle(HttpMethod.GET, "/:code", this::get));
         routers.add(new RouterHandle(HttpMethod.GET, "/raw/:code", this::get));
         routers.add(new RouterHandle(HttpMethod.GET, "/redirect/:code", this::get));
-        routers.add(new RouterHandle(HttpMethod.POST, "/save", this::set, true));
+        routers.add(new RouterHandle(HttpMethod.PUT, "/auth/save", this::save, true));
     }
 
     public void get(RoutingContext context) {
         String code = context.pathParams().get("code");
         log.info("code: {}", code);
         vertx.eventBus()
-                .request(Constants.EventBusAddress.DB_PASTE_SELECT, new JsonObject().put("code", code))
+                .request(EventBuses.DB_PASTE_SELECT, new JsonObject().put("code", code))
                 .onSuccess(ar -> {
                     Msg msg = Msg.fromJson(ar.body());
                     if (msg.isOk()) {
@@ -50,7 +50,7 @@ public class PasteBinVerticle extends RouterVerticle {
                 });
     }
 
-    private void set(RoutingContext context) {
+    private void save(RoutingContext context) {
         JsonObject body = context.getBodyAsJson();
         String code = body.getString("code");
         String content = body.getString("content");
@@ -58,7 +58,7 @@ public class PasteBinVerticle extends RouterVerticle {
             code = RandomStringUtils.randomAlphanumeric(4);
         }
         vertx.eventBus()
-                .request(Constants.EventBusAddress.DB_PASTE_INSERT,
+                .request(EventBuses.DB_PASTE_INSERT,
                         new JsonObject()
                                 .put("code", code)
                                 .put("content", content)

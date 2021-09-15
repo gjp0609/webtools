@@ -1,4 +1,4 @@
-package com.onysakura.webtools.config;
+package com.onysakura.webtools.common.config;
 
 public enum Configs {
     CONF_FILE("conf_file"),

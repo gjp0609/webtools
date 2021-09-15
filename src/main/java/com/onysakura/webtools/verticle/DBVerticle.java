@@ -1,9 +1,9 @@
 package com.onysakura.webtools.verticle;
 
-import com.onysakura.webtools.common.Constants;
+import com.onysakura.webtools.common.config.EventBuses;
 import com.onysakura.webtools.common.dto.Msg;
 import com.onysakura.webtools.common.router.RouterVerticle;
-import com.onysakura.webtools.config.log.LoggerUtil;
+import com.onysakura.webtools.common.config.log.LoggerUtil;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.jdbcclient.JDBCConnectOptions;
@@ -11,8 +11,6 @@ import io.vertx.jdbcclient.JDBCPool;
 import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class DBVerticle extends RouterVerticle {
     private static final LoggerUtil.Log log = LoggerUtil.getLogger(DBVerticle.class);
@@ -22,9 +20,9 @@ public class DBVerticle extends RouterVerticle {
     @Override
     public void start() throws Exception {
         init();
-        vertx.eventBus().consumer(Constants.EventBusAddress.DB_USER_SELECT, this::userSelectByUsername);
-        vertx.eventBus().consumer(Constants.EventBusAddress.DB_PASTE_SELECT, this::pasteSelectByCode);
-        vertx.eventBus().consumer(Constants.EventBusAddress.DB_PASTE_INSERT, this::pasteInsert);
+        vertx.eventBus().consumer(EventBuses.DB_USER_SELECT, this::userSelectByUsername);
+        vertx.eventBus().consumer(EventBuses.DB_PASTE_SELECT, this::pasteSelectByCode);
+        vertx.eventBus().consumer(EventBuses.DB_PASTE_INSERT, this::pasteInsert);
     }
 
     private void userSelectByUsername(Message<JsonObject> message) {
@@ -46,9 +44,12 @@ public class DBVerticle extends RouterVerticle {
     }
 
     private void pasteInsert(Message<JsonObject> message) {
-        String code = message.body().getString("code");
+        JsonObject body = message.body();
+        String code = body.getString("code");
+        String content = body.getString("content");
+        log.info("save {}, {}", code, content);
         pool.preparedQuery("insert into paste(code, content) VALUES (?, ?)")
-                .execute(Tuple.of(code, message.body().getString("content")))
+                .execute(Tuple.of(code, content))
                 .onSuccess(rows -> {
                     log.info("insert rows: {}", rows);
                     message.reply(Msg.ok(code));

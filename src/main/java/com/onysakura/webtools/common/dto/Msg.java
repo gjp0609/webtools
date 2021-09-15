@@ -1,24 +1,28 @@
 package com.onysakura.webtools.common.dto;
 
-import com.onysakura.webtools.common.Constants;
+import com.onysakura.webtools.common.config.Constants;
 import io.vertx.core.json.JsonObject;
 
 public class Msg extends JsonObject {
 
     public static JsonObject ok() {
-        return new Msg().put("status", Constants.Status.ok);
+        return new Msg().put("status", Constants.Status.OK);
     }
 
     public static JsonObject ok(String msg) {
-        return new Msg().put("status", Constants.Status.ok).put("msg", msg);
+        return new Msg().put("status", Constants.Status.OK).put("msg", msg);
     }
 
     public static JsonObject fail() {
-        return new Msg().put("status", Constants.Status.fail);
+        return new Msg().put("status", Constants.Status.FAIL);
     }
 
     public static JsonObject fail(String msg) {
-        return new Msg().put("status", Constants.Status.fail).put("msg", msg);
+        return new Msg().put("status", Constants.Status.FAIL).put("msg", msg);
+    }
+
+    public static JsonObject fail(int status, String msg) {
+        return new Msg().put("status", status).put("msg", msg);
     }
 
     public static Msg fromJson(Object jsonObject) {

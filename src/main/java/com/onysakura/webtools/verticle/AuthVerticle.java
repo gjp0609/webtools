@@ -1,11 +1,12 @@
 package com.onysakura.webtools.verticle;
 
-import com.onysakura.webtools.common.Constants;
+import com.onysakura.webtools.common.config.Configs;
+import com.onysakura.webtools.common.config.Constants;
+import com.onysakura.webtools.common.config.EventBuses;
+import com.onysakura.webtools.common.config.log.LoggerUtil;
 import com.onysakura.webtools.common.dto.Msg;
 import com.onysakura.webtools.common.router.RouterHandle;
 import com.onysakura.webtools.common.router.RouterVerticle;
-import com.onysakura.webtools.config.Configs;
-import com.onysakura.webtools.config.log.LoggerUtil;
 import com.onysakura.webtools.utils.SecurityUtil;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.vertx.core.http.HttpMethod;
@@ -17,7 +18,6 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 public class AuthVerticle extends RouterVerticle {
@@ -26,7 +26,6 @@ public class AuthVerticle extends RouterVerticle {
     private static final String ALGORITHM = "RS512";
 
     private JWTAuth auth;
-    private final List<String> ignorePath = Arrays.asList("/api/auth/paste/redirect", "/api/auth/paste/raw");
 
     @Override
     public void start() throws Exception {
@@ -45,7 +44,7 @@ public class AuthVerticle extends RouterVerticle {
         String passwordMD5 = body.getString("password");
         log.info("login: {}, {}", username, passwordMD5);
         vertx.eventBus()
-                .request(Constants.EventBusAddress.DB_USER_SELECT, new JsonObject().put("username", username))
+                .request(EventBuses.DB_USER_SELECT, new JsonObject().put("username", username))
                 .onSuccess(ar -> {
                     Msg msg = Msg.fromJson(ar.body());
                     if (msg.isOk()) {
@@ -73,21 +72,23 @@ public class AuthVerticle extends RouterVerticle {
 
     public void auth(RoutingContext context) {
         String normalizedPath = context.normalizedPath();
-        log.warn("normalizedPath: {}", normalizedPath);
-        for (String path : ignorePath) {
-            if (normalizedPath.startsWith(path)) {
-                context.next();
-                return;
-            }
+        HttpMethod method = context.request().method();
+        log.debug("auth: {} {}", method, normalizedPath);
+        if (normalizedPath.contains("/auth/") && Arrays.asList(HttpMethod.POST, HttpMethod.PUT).contains(method)) {
+            String authorization = context.request().getHeader(HttpHeaderNames.AUTHORIZATION);
+            auth.authenticate(new JsonObject().put("token", authorization))
+                    .onSuccess(user -> {
+                        context.next();
+                        log.debug("pass");
+                    })
+                    .onFailure(err -> {
+                        log.debug("fail");
+                        context.json(Msg.fail(Constants.Status.INVALID_TOKEN, "invalid token!"));
+                    });
+        } else {
+            log.debug("pass");
+            context.next();
         }
-        String authorization = context.request().getHeader(HttpHeaderNames.AUTHORIZATION);
-        auth.authenticate(new JsonObject().put("token", authorization))
-                .onSuccess(user -> {
-                    context.next();
-                })
-                .onFailure(err -> {
-                    context.json(Msg.fail("invalid token!"));
-                });
     }
 
 }
